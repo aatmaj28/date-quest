@@ -1,0 +1,1910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadia's Date Quest Adventure 🎮</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            border-radius: 25px;
+            padding: 30px 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .quest {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .quest.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #667eea;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .story-text {
+            font-size: 1.1em;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .disclaimer {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .disclaimer-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .disclaimer-text {
+            color: #856404;
+            font-size: 1em;
+            line-height: 1.5;
+        }
+
+        .xp-bar-container {
+            background: #e0e0e0;
+            height: 30px;
+            border-radius: 15px;
+            margin: 15px 0;
+            position: relative;
+            overflow: visible;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .xp-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            transition: width 0.8s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .badge-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            transition: all 0.3s ease;
+            filter: grayscale(100%);
+            opacity: 0.4;
+        }
+
+        .badge.unlocked {
+            filter: grayscale(0%);
+            opacity: 1;
+            animation: popIn 0.5s ease;
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover, .btn:active {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .drag-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            min-height: 200px;
+            padding: 20px;
+            margin: 20px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: flex-end;
+            justify-content: center;
+            background: #f8f9ff;
+        }
+
+        .brick-source {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .brick {
+            width: 80px;
+            height: 55px;
+            border-radius: 8px;
+            cursor: move;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+            text-align: center;
+            padding: 5px;
+            touch-action: none;
+            transition: transform 0.2s;
+        }
+
+        .brick:active {
+            transform: scale(1.05);
+        }
+
+        .brick::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 8px;
+            background: inherit;
+            border-radius: 4px;
+            opacity: 0.8;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .vibe-card {
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .vibe-card:hover, .vibe-card:active {
+            transform: scale(1.05);
+            border-color: #764ba2;
+            background: #f8f9ff;
+        }
+
+        .vibe-card.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .vibe-card .emoji {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 20px auto;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 8px solid #667eea;
+            position: relative;
+            transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            background: conic-gradient(
+                #FF6B6B 0deg 60deg,
+                #4ECDC4 60deg 120deg,
+                #FFE66D 120deg 180deg,
+                #95E1D3 180deg 240deg,
+                #F38181 240deg 300deg,
+                #AA96DA 300deg 360deg
+            );
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .wheel-label {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .wheel-label span {
+            position: absolute;
+            transform-origin: center;
+            width: 80px;
+        }
+
+        .label-1 { transform: rotate(30deg) translateY(-100px); }
+        .label-2 { transform: rotate(90deg) translateY(-100px); }
+        .label-3 { transform: rotate(150deg) translateY(-100px); color: #333; }
+        .label-4 { transform: rotate(210deg) translateY(-100px); }
+        .label-5 { transform: rotate(270deg) translateY(-100px); }
+        .label-6 { transform: rotate(330deg) translateY(-100px); }
+
+        .wheel-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 50%;
+            border: 4px solid #667eea;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .wheel-pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 25px solid #f5576c;
+            z-index: 11;
+        }
+
+        .game-area {
+            position: relative;
+            height: 400px;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            overflow: hidden;
+            background: linear-gradient(180deg, #fff5f5 0%, #ffe5e5 100%);
+            margin: 20px 0;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 2em;
+            cursor: pointer;
+            user-select: none;
+            animation: fall linear;
+            transition: transform 0.1s;
+        }
+
+        .heart:active {
+            transform: scale(1.3);
+        }
+
+        @keyframes fall {
+            to {
+                top: 100%;
+            }
+        }
+
+        .score-display {
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 15px 0;
+        }
+
+        .timer-display {
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #f5576c;
+            margin: 10px 0;
+        }
+
+        .warning-message {
+            background: #ffebee;
+            border: 2px solid #f5576c;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .warning-message strong {
+            color: #c62828;
+            font-size: 1.1em;
+        }
+
+        .special-btn {
+            background: white;
+            border: 3px solid #667eea;
+            color: #667eea;
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .special-btn:hover, .special-btn:active {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .special-btn.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .dice-container {
+            perspective: 1000px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 250px;
+            margin: 30px 0;
+        }
+
+        .dice {
+            width: 150px;
+            height: 150px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .dice-face {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 3px solid #fff;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        .dice-face-1 { transform: rotateY(0deg) translateZ(75px); }
+        .dice-face-2 { transform: rotateY(90deg) translateZ(75px); }
+        .dice-face-3 { transform: rotateY(180deg) translateZ(75px); }
+        .dice-face-4 { transform: rotateY(-90deg) translateZ(75px); }
+        .dice-face-5 { transform: rotateX(90deg) translateZ(75px); }
+        .dice-face-6 { transform: rotateX(-90deg) translateZ(75px); }
+
+        .dice-options-list {
+            background: #f8f9ff;
+            border: 2px solid #667eea;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .dice-options-list h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .dice-options-list ol {
+            list-style-position: inside;
+            color: #555;
+        }
+
+        .dice-options-list li {
+            padding: 8px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            font-size: 1em;
+            margin: 8px 0;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        textarea.input-field {
+            width: 100%;
+            min-height: 120px;
+            resize: vertical;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.5;
+        }
+
+        .final-reveal {
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        .puzzle-rearrange {
+            display: grid;
+            grid-template-columns: repeat(3, 80px);
+            gap: 10px;
+            margin: 30px auto;
+            justify-content: center;
+        }
+
+        .puzzle-letter {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2em;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+            animation: puzzleFly 1s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes puzzleFly {
+            0% {
+                transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(0);
+                opacity: 0;
+            }
+            60% {
+                transform: translate(0, 0) rotate(0) scale(1.1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(0, 0) rotate(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .final-question {
+            font-size: 2em;
+            color: #667eea;
+            text-align: center;
+            margin: 30px 0;
+            animation: pulse 1.5s infinite;
+            font-weight: bold;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .yes-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 25px 50px;
+            font-size: 1.8em;
+            border-radius: 20px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            box-shadow: 0 10px 30px rgba(245, 87, 108, 0.4);
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .yes-btn:hover, .yes-btn:active {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(245, 87, 108, 0.6);
+        }
+
+        .quest-card {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            border-radius: 25px;
+            padding: 35px;
+            color: white;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+            font-family: 'Georgia', 'Times New Roman', serif;
+        }
+
+        .quest-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
+            animation: shimmer 8s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+        }
+
+        .quest-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            padding-bottom: 15px;
+        }
+
+        .quest-card-header h2 {
+            margin: 0;
+            font-size: 1.8em;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, #ffd89b 0%, #19547b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .photo-container {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin: 30px 0;
+            align-items: center;
+        }
+
+        .photo-placeholder {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2em;
+            border: 5px solid rgba(255,255,255,0.9);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .photo-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .date-summary {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .date-summary p {
+            margin: 12px 0;
+            font-size: 1.05em;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.95);
+        }
+
+        .date-summary p strong {
+            color: #ffd89b;
+            font-weight: 600;
+            display: inline-block;
+            min-width: 100px;
+            letter-spacing: 0.5px;
+        }
+
+        .quest-card .couple-names {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .quest-card .couple-names h3 {
+            font-size: 1.8em;
+            margin: 10px 0;
+            background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-family: 'Georgia', serif;
+            letter-spacing: 3px;
+        }
+
+        .quest-card .couple-names p {
+            color: rgba(255,255,255,0.8);
+            font-style: italic;
+            font-size: 1.1em;
+            letter-spacing: 1px;
+        }
+
+        .quest-card .quote-section {
+            text-align: center;
+            font-style: italic;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            font-size: 1.15em;
+            color: rgba(255,255,255,0.9);
+            letter-spacing: 0.5px;
+            line-height: 1.6;
+        }
+
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .share-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .copy-btn {
+            background: white;
+            color: #667eea;
+        }
+
+        .instagram-btn {
+            background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border-radius: 15px;
+            cursor: pointer;
+            margin: 10px 0;
+            box-shadow: 0 5px 15px rgba(188, 24, 136, 0.4);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .intro-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            border: 4px solid white;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px 15px;
+            }
+            h1 {
+                font-size: 1.6em;
+            }
+            .wheel-container {
+                width: 240px;
+                height: 240px;
+            }
+            .dice {
+                width: 120px;
+                height: 120px;
+            }
+            .dice-face {
+                width: 120px;
+                height: 120px;
+                font-size: 0.8em;
+            }
+            .dice-face-1 { transform: rotateY(0deg) translateZ(60px); }
+            .dice-face-2 { transform: rotateY(90deg) translateZ(60px); }
+            .dice-face-3 { transform: rotateY(180deg) translateZ(60px); }
+            .dice-face-4 { transform: rotateY(-90deg) translateZ(60px); }
+            .dice-face-5 { transform: rotateX(90deg) translateZ(60px); }
+            .dice-face-6 { transform: rotateX(-90deg) translateZ(60px); }
+            .puzzle-rearrange {
+                grid-template-columns: repeat(3, 60px);
+            }
+            .puzzle-letter {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Quest 0: Intro with Disclaimer -->
+        <div class="quest active" id="quest0">
+            <div class="intro-card">
+                <div class="avatar">🧱</div>
+                <h1 style="color: white; margin-bottom: 10px;">Hi Shadia! I'm Aatmaj</h1>
+                <p style="font-size: 1.1em; line-height: 1.6;">
+                    Your co-builder for today's tiny adventure! 👋<br><br>
+                    I've designed 7 special quests just for you, Shadia.<br><br>
+                    Each quest unlocks a piece of something special...<br><br>
+                </p>
+            </div>
+            
+            <div class="disclaimer">
+                <div class="disclaimer-title">⚠️ IMPORTANT DISCLAIMER ⚠️</div>
+                <div class="disclaimer-text">
+                    You won't be able to go back to previous stages!<br>
+                    Choose carefully and wisely, Shadia...<br>
+                    Let destiny decide the rest. 🎲✨
+                </div>
+            </div>
+            
+            <button class="btn" onclick="startQuest(1)">I'm Ready! Let's Start! 🚀</button>
+        </div>
+
+        <!-- XP Bar -->
+        <div id="xpBar" style="display: none;">
+            <div class="xp-bar-container">
+                <div class="xp-bar" id="xpFill" style="width: 0%;">
+                    <span id="xpText">Quest 0/7</span>
+                </div>
+            </div>
+            <div class="badge-container">
+                <div class="badge" id="badge1">🧱</div>
+                <div class="badge" id="badge2">💫</div>
+                <div class="badge" id="badge3">🎡</div>
+                <div class="badge" id="badge4">💝</div>
+                <div class="badge" id="badge5">✨</div>
+                <div class="badge" id="badge6">🎲</div>
+                <div class="badge" id="badge7">🧩</div>
+            </div>
+        </div>
+
+        <!-- Quest 1: Build Foundation -->
+        <div class="quest" id="quest1">
+            <h1>Quest 1: Build Our Foundation</h1>
+            <p class="subtitle">Shadia, choose 2 LEGO bricks from 4 options!</p>
+            <p class="story-text">Every great story starts with a foundation. Pick the values that matter most to you!</p>
+            
+            <div class="drag-area" id="dropZone">
+                <p style="color: #999; font-style: italic;" id="dropHint">Drag 2 bricks here...</p>
+            </div>
+            
+            <div class="brick-source">
+                <div class="brick" draggable="true" style="background: #FF6B6B;" data-brick="1">Trust</div>
+                <div class="brick" draggable="true" style="background: #4ECDC4;" data-brick="2">Wonder</div>
+                <div class="brick" draggable="true" style="background: #FFE66D;" data-brick="3">Joy</div>
+                <div class="brick" draggable="true" style="background: #95E1D3;" data-brick="4">Adventure</div>
+            </div>
+        </div>
+
+        <!-- Quest 2: Match the Vibe -->
+        <div class="quest" id="quest2">
+            <h1>Quest 2: Shadia's Vibe Check</h1>
+            <p class="subtitle">What energy should our date have?</p>
+            
+            <div class="card-grid">
+                <div class="vibe-card" onclick="selectVibe(this, 'Cozy & Chill')">
+                    <div class="emoji">☕</div>
+                    <div>Cozy & Chill</div>
+                </div>
+                <div class="vibe-card" onclick="selectVibe(this, 'Adventurous')">
+                    <div class="emoji">🎢</div>
+                    <div>Adventurous</div>
+                </div>
+                <div class="vibe-card" onclick="selectVibe(this, 'Creative')">
+                    <div class="emoji">🎨</div>
+                    <div>Creative</div>
+                </div>
+                <div class="vibe-card" onclick="selectVibe(this, 'Romantic')">
+                    <div class="emoji">💕</div>
+                    <div>Romantic</div>
+                </div>
+            </div>
+            
+            <button class="btn" id="vibeBtn" style="display: none;" onclick="completeQuest2()">Lock It In! ✨</button>
+        </div>
+
+        <!-- Quest 3: Spin the Wheel -->
+        <div class="quest" id="quest3">
+            <h1>Quest 3: Destiny Wheel</h1>
+            <p class="subtitle">Let fate decide our adventure, Shadia!</p>
+            
+            <div class="wheel-container">
+                <div class="wheel-pointer"></div>
+                <div class="wheel" id="wheel">
+                    <div class="wheel-label">
+                        <span class="label-1">Cook Together</span>
+                        <span class="label-2">Coffee Date</span>
+                        <span class="label-3">Museum</span>
+                        <span class="label-4">Picnic</span>
+                        <span class="label-5">Board Games</span>
+                        <span class="label-6">Explore City</span>
+                    </div>
+                    <div class="wheel-center">SPIN</div>
+                </div>
+            </div>
+            
+            <p class="story-text" id="wheelResult" style="display: none; font-weight: bold; color: #667eea;"></p>
+            <button class="btn" onclick="spinWheel()">Spin the Wheel! 🎡</button>
+            <button class="btn" id="wheelNext" style="display: none;" onclick="startQuest(4)">Continue Quest →</button>
+        </div>
+
+        <!-- Quest 4: Heart Catcher Game -->
+        <div class="quest" id="quest4">
+            <h1>Quest 4: Catch My Heart</h1>
+            <p class="subtitle">Help me gather the courage, Shadia! Catch 15 hearts! 💝</p>
+            
+            <div class="warning-message">
+                <strong>⚠️ WARNING:</strong> If 5 hearts touch the bottom OR time runs out, maybe we should just connect somewhere else... 😉🙈
+            </div>
+            
+            <div class="score-display">
+                Hearts Caught: <span id="heartScore">0</span>/15 | 
+                Missed: <span id="missedScore">0</span>/5
+            </div>
+            
+            <div class="timer-display">
+                Time: <span id="timeLeft">20</span>s
+            </div>
+            
+            <div class="game-area" id="gameArea"></div>
+            
+            <button class="btn" id="startHeartGame" onclick="startHeartGame()">Start Game! 💕</button>
+        </div>
+
+        <!-- Instagram Request -->
+        <div class="quest" id="instagramRequest">
+            <h1>Oops, Shadia! 😅</h1>
+            <p class="story-text" style="font-size: 1.3em;">
+                Looks like my hearts got away from me...<br><br>
+                But hey, maybe this is a sign we should stay connected? 💬
+            </p>
+            
+            <p class="story-text">Your Instagram handle would help me... you know... 😊</p>
+            
+            <input type="text" class="input-field" id="instagramHandle" placeholder="@your_instagram" maxlength="50">
+            
+            <button class="btn" onclick="submitInstagram()">Send & Continue 💌</button>
+        </div>
+
+        <!-- Quest 5: Special Touch -->
+        <div class="quest" id="quest5">
+            <h1>Quest 5: The Special Touch</h1>
+            <p class="subtitle">Okay Shadia, courage = acquired! ✅</p>
+            <p class="story-text">
+                But here's the thing... I want this to be memorable for you.<br>
+                What would make this date extra special?
+            </p>
+            
+            <div style="display: flex; flex-direction: column; gap: 10px; margin: 20px 0;">
+                <button class="special-btn" onclick="selectSpecial(this, 'Surprise element')">
+                    🎁 Add a surprise element!
+                </button>
+                <button class="special-btn" onclick="selectSpecial(this, 'Plan together')">
+                    🤝 Plan it together
+                </button>
+                <button class="special-btn" onclick="selectSpecial(this, 'Simple & genuine')">
+                    😊 Keep it simple & genuine
+                </button>
+            </div>
+            
+            <button class="btn" id="specialBtn" style="display: none;" onclick="completeQuest5()">Perfect Choice! →</button>
+        </div>
+
+        <!-- Quest 6: Destiny Dice (Rigged!) -->
+        <div class="quest" id="quest6">
+            <h1>Quest 6: The Destiny Dice</h1>
+            <p class="subtitle">Almost there, Shadia! When should this magical date happen?</p>
+            <p class="story-text">Enter 3 timing options, then roll the dice! 🎲</p>
+            
+            <input type="text" class="input-field" id="option1" placeholder="Option 1 (e.g., This Saturday)" maxlength="30">
+            <input type="text" class="input-field" id="option2" placeholder="Option 2 (e.g., Next Friday)" maxlength="30">
+            <input type="text" class="input-field" id="option3" placeholder="Option 3 (e.g., Whenever!)" maxlength="30">
+            
+            <button class="btn" onclick="setupDice()" id="setupDiceBtn">Setup Dice! 🎲</button>
+            
+            <div id="diceSection" style="display: none;">
+                <div class="dice-options-list">
+                    <h3>🎲 All 6 Dice Faces (Totally not rigged, Shadia 😇):</h3>
+                    <ol id="diceOptionsList">
+                        <li id="diceOpt1"></li>
+                        <li id="diceOpt2"></li>
+                        <li id="diceOpt3"></li>
+                        <li id="diceOpt4">Next Weekend</li>
+                        <li id="diceOpt5">Lost your chance, now convince me!!</li>
+                        <li id="diceOpt6">Only if you bring Mishti Doi! 🍮</li>
+                    </ol>
+                </div>
+                
+                <div class="dice-container">
+                    <div class="dice" id="dice">
+                        <div class="dice-face dice-face-1" id="face1"></div>
+                        <div class="dice-face dice-face-2" id="face2"></div>
+                        <div class="dice-face dice-face-3" id="face3"></div>
+                        <div class="dice-face dice-face-4" id="face4">Next Weekend</div>
+                        <div class="dice-face dice-face-5" id="face5">Lost your chance, now convince me!!</div>
+                        <div class="dice-face dice-face-6" id="face6">Only if you bring Mishti Doi! 🍮</div>
+                    </div>
+                </div>
+                
+                <p class="story-text" id="diceResult" style="display: none; font-weight: bold; color: #f5576c; font-size: 1.3em;"></p>
+                
+                <button class="btn" onclick="rollDice()" id="rollBtn">Roll the Dice! 🎲</button>
+                <button class="btn" onclick="rerollDice()" id="rerollBtn" style="display: none; background: #f5576c;">
+                    That Can't Be Right... Re-roll! 🔄
+                </button>
+                <button class="btn" id="diceNext" style="display: none;" onclick="acceptMishtiDoi()">
+                    I guess that's what cupid wants ;) continue →
+                </button>
+            </div>
+        </div>
+
+        <!-- Quest 7: Final Reveal -->
+        <div class="quest" id="quest7">
+            <h1>Quest 7: The Final Message</h1>
+            <p class="subtitle">Watch as the pieces come together, Shadia...</p>
+            
+            <div class="final-reveal">
+                <div class="puzzle-rearrange" id="puzzleReveal"></div>
+            </div>
+            
+            <button class="btn" id="revealBtn" onclick="startPuzzleReveal()">Reveal the Message! ✨</button>
+            <button class="btn" id="finalNext" style="display: none;" onclick="startQuest(8)">Continue to Question →</button>
+        </div>
+
+        <!-- Quest 8: The Big Question -->
+        <div class="quest" id="quest8">
+            <h1>🎉 All Quests Complete! 🎉</h1>
+            <p class="story-text">We built something amazing together, Shadia...<br>Brick by brick, choice by choice, heart by heart.</p>
+            
+            <div class="final-question">
+                A DATE?💕
+            </div>
+            
+            <p class="story-text" style="font-style: italic; color: #999;">
+                (You know what I'm really asking... 😊)
+            </p>
+            
+            <button class="yes-btn" onclick="celebrate()">YES! 💕</button>
+            <button class="btn" style="background: #ddd; color: #666;" onclick="showThinking()">Let me think...</button>
+        </div>
+
+        <!-- Success Screen -->
+        <div class="quest" id="success">
+            <h1 style="color: #f5576c;">🎊 SHE SAID YES! 🎊</h1>
+            <p class="story-text" style="font-size: 1.3em;">This is going to be amazing! 🚀</p>
+            
+            <div id="questCard" class="quest-card">
+                <div class="quest-card-header">
+                    <h2 style="margin: 0;">Our Date Quest</h2>
+                    <span style="font-size: 1.8em;">✨💕✨</span>
+                </div>
+                
+                <div class="photo-container">
+                    <div class="photo-placeholder" id="shadiaPhoto">
+                        <!-- <span>👩</span> -->
+                        <img src="shadia.jpeg" alt="Shadia" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    </div>
+                    <div style="font-size: 2.5em; display: flex; align-items: center; animation: pulse 1.5s infinite;">❤️</div>
+                    <div class="photo-placeholder" id="aatmajPhoto">
+                        <!-- <span>👨</span> -->
+                        <img src="aatmaj.jpg" alt="Aatmaj" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    </div>
+                </div>
+                
+                <div class="couple-names">
+                    <h3>Shadia & Aatmaj</h3>
+                    <p>Co-Builders of Something Beautiful</p>
+                </div>
+                
+                <div class="date-summary">
+                    <p><strong>Foundation:</strong> <span id="cardBricks">Trust & Wonder</span></p>
+                    <p><strong>Vibe:</strong> <span id="cardVibe">Amazing</span></p>
+                    <p><strong>Activity:</strong> <span id="cardActivity">Adventure awaits</span></p>
+                    <p><strong>Special:</strong> <span id="cardSpecial">Memorable moments</span></p>
+                    <p><strong>Brings:</strong> <span style="color: #ffd89b;">Mishti Doi! 🍮</span></p>
+                    <p><strong>Status:</strong> <span style="color: #4CAF50;">Quest Complete! ✅</span></p>
+                </div>
+                
+                <p class="quote-section">
+                    "Two hearts, seven quests, one beautiful beginning..."
+                </p>
+            </div>
+            
+            <button class="share-btn save-btn" onclick="saveQuestCard()" style="width: 100%;">📸 Save Our Date Card</button>
+            
+            <a href="https://www.instagram.com/aatmaj_salunke/?igsh=ZmNhd3F0ems5ZnR6&utm_source=qr#" target="_blank" class="instagram-btn">
+                💬 Let's Plan This Date!
+            </a>
+        </div>
+
+        <!-- Thinking Screen -->
+        <div class="quest" id="thinking">
+            <h1>Wait, Shadia! 🤚</h1>
+            <p class="story-text">
+                We just completed 7 quests together!<br>
+                Built foundations, chose vibes, spun wheels, caught hearts, picked special touches, rolled rigged dice...<br><br>
+                That's gotta count for something, right? 😅<br><br>
+                What would it take to make this a yes?
+            </p>
+            
+            <div style="position: relative; z-index: 100;">
+                <input type="text" 
+                       id="feedbackBox" 
+                       class="input-field" 
+                       placeholder="Share your thoughts... 💭" 
+                       maxlength="500"
+                       style="width: 100%; padding: 12px; border: 2px solid #667eea; border-radius: 10px; font-size: 1em; margin: 8px 0; font-family: inherit; position: relative; z-index: 1000;">
+            </div>
+            
+            <button class="btn" onclick="sendThoughts()">Send My Thoughts 💌</button>
+            <button class="btn" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);" onclick="celebrate()">Actually... YES! 💕</button>
+        </div>
+
+        <!-- Awaiting Response -->
+        <div class="quest" id="awaiting">
+            <h1>📬 Message Delivered!</h1>
+            <p class="story-text">
+                Your message reached Mission Control, Shadia! 🚀<br><br>
+                <span style="font-size: 1.2em; color: #667eea; font-weight: bold;">Status: Awaiting response...</span>
+            </p>
+            
+            <div style="background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%); padding: 20px; border-radius: 15px; margin: 20px 0; font-style: italic; color: #555;">
+                "The best things in life are worth waiting for...<br>
+                but honestly, I'm checking notifications every 2 seconds."<br>
+                <span style="font-weight: bold;">- The Guy Who Built This For Shadia 😅</span>
+            </div>
+            
+            <a href="https://www.instagram.com/aatmaj_salunke/?igsh=ZmNhd3F0ems5ZnR6&utm_source=qr#" target="_blank" class="instagram-btn">
+                💬 Chat on Instagram Instead?
+            </a>
+        </div>
+    </div>
+
+    <script>
+        let questData = {
+            bricks: [],
+            vibe: '',
+            activity: '',
+            special: '',
+            timing: '',
+            heartsCaught: 0,
+            heartsMissed: 0,
+            instagramHandle: ''
+        };
+
+        // Function to send progress updates to Google Form
+        function sendProgress(questNumber, data) {
+            const formData = new FormData();
+            formData.append('entry.1503858126', 'Quest ' + questNumber);
+            formData.append('entry.587583501', JSON.stringify(data));
+            formData.append('entry.759815175', new Date().toISOString());
+            
+            fetch('https://docs.google.com/forms/d/e/1FAIpQLSdbtHqeT_9ZQpoEXRqXz7X0NEoORiwzxWxQRndQXtKQVcdo5g/formResponse', {
+                method: 'POST',
+                mode: 'no-cors',
+                body: formData
+            });
+        }
+
+        let currentQuest = 0;
+        const wheelOptions = ['Cook Together 👨‍🍳', 'Coffee Date ☕', 'Museum Tour 🎨', 'Picnic 🧺', 'Board Games 🎲', 'Explore City 🗺️'];
+
+        function startQuest(questNum) {
+            document.querySelectorAll('.quest').forEach(q => q.classList.remove('active'));
+            document.getElementById('quest' + questNum).classList.add('active');
+            
+            if (questNum >= 1 && questNum <= 7) {
+                document.getElementById('xpBar').style.display = 'block';
+                updateXP(questNum - 1);
+            } else {
+                document.getElementById('xpBar').style.display = 'none';
+            }
+            
+            currentQuest = questNum;
+            
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+
+        function updateXP(questsComplete) {
+            const percentage = (questsComplete / 7) * 100;
+            document.getElementById('xpFill').style.width = percentage + '%';
+            document.getElementById('xpText').textContent = `Quest ${questsComplete}/7`;
+            
+            if (questsComplete > 0) {
+                for (let i = 1; i <= questsComplete; i++) {
+                    document.getElementById('badge' + i).classList.add('unlocked');
+                }
+            }
+        }
+
+        // Quest 1: Drag & Drop (Pick 2 from 4)
+        let draggedElement = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const bricks = document.querySelectorAll('.brick');
+            const dropZone = document.getElementById('dropZone');
+            
+            bricks.forEach(brick => {
+                brick.addEventListener('dragstart', handleDragStart);
+                brick.addEventListener('touchstart', handleTouchStart, {passive: false});
+                brick.addEventListener('touchmove', handleTouchMove, {passive: false});
+                brick.addEventListener('touchend', handleTouchEnd);
+            });
+            
+            if (dropZone) {
+                dropZone.addEventListener('dragover', handleDragOver);
+                dropZone.addEventListener('drop', handleDrop);
+            }
+        });
+
+        function handleDragStart(e) {
+            draggedElement = this;
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+            
+            if (draggedElement && questData.bricks.length < 2) {
+                const clone = draggedElement.cloneNode(true);
+                clone.draggable = false;
+                clone.style.cursor = 'default';
+                document.getElementById('dropZone').appendChild(clone);
+                draggedElement.style.opacity = '0.3';
+                draggedElement.draggable = false;
+                
+                questData.bricks.push(draggedElement.textContent);
+                
+                if (questData.bricks.length === 2) {
+                    document.getElementById('dropHint').style.display = 'none';
+                    // Track Quest 1 completion
+                    sendProgress(1, {
+                        bricks_chosen: questData.bricks,
+                        timestamp: new Date().toISOString()
+                    });
+                    setTimeout(() => {
+                        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+                        startQuest(2);
+                    }, 800);
+                }
+            }
+            
+            return false;
+        }
+
+        let touchClone = null;
+        let touchOrigin = null;
+
+        function handleTouchStart(e) {
+            e.preventDefault();
+            touchOrigin = this;
+            const touch = e.touches[0];
+            
+            touchClone = this.cloneNode(true);
+            touchClone.style.position = 'fixed';
+            touchClone.style.zIndex = '1000';
+            touchClone.style.pointerEvents = 'none';
+            touchClone.style.left = touch.pageX - 40 + 'px';
+            touchClone.style.top = touch.pageY - 27 + 'px';
+            document.body.appendChild(touchClone);
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            if (!touchClone) return;
+            
+            const touch = e.touches[0];
+            touchClone.style.left = touch.pageX - 40 + 'px';
+            touchClone.style.top = touch.pageY - 27 + 'px';
+        }
+
+        function handleTouchEnd(e) {
+            e.preventDefault();
+            if (!touchClone) return;
+            
+            const touch = e.changedTouches[0];
+            const dropZone = document.getElementById('dropZone');
+            const rect = dropZone.getBoundingClientRect();
+            
+            if (touch.pageX >= rect.left && touch.pageX <= rect.right &&
+                touch.pageY >= rect.top && touch.pageY <= rect.bottom &&
+                questData.bricks.length < 2) {
+                
+                const clone = touchOrigin.cloneNode(true);
+                clone.style.position = 'relative';
+                clone.style.cursor = 'default';
+                dropZone.appendChild(clone);
+                touchOrigin.style.opacity = '0.3';
+                
+                questData.bricks.push(touchOrigin.textContent);
+                
+                if (questData.bricks.length === 2) {
+                    document.getElementById('dropHint').style.display = 'none';
+                    // Track Quest 1 completion
+                    sendProgress(1, {
+                        bricks_chosen: questData.bricks,
+                        timestamp: new Date().toISOString()
+                    });
+                    setTimeout(() => {
+                        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+                        startQuest(2);
+                    }, 800);
+                }
+            }
+            
+            document.body.removeChild(touchClone);
+            touchClone = null;
+            touchOrigin = null;
+        }
+
+        // Quest 2: Vibe Selection
+        function selectVibe(card, vibe) {
+            document.querySelectorAll('.vibe-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            questData.vibe = vibe;
+            document.getElementById('vibeBtn').style.display = 'block';
+            
+            if (navigator.vibrate) navigator.vibrate(50);
+        }
+        
+        function completeQuest2() {
+            // Track Quest 2 completion
+            sendProgress(2, {
+                vibe_chosen: questData.vibe,
+                timestamp: new Date().toISOString()
+            });
+            startQuest(3);
+        }
+
+        // Quest 3: Spin Wheel
+        let hasSpun = false;
+
+        function spinWheel() {
+            if (hasSpun) return;
+            hasSpun = true;
+            
+            const wheel = document.getElementById('wheel');
+            const selectedIndex = Math.floor(Math.random() * wheelOptions.length);
+            
+            // Calculate exact rotation to land on selected slice
+            // Each slice is 60 degrees, pointer is at top (0 degrees)
+            // We want the CENTER of the selected slice under the pointer
+            const sliceDegrees = 60;
+            const targetAngle = (selectedIndex * sliceDegrees) + (sliceDegrees / 2); // Center of slice
+            const spins = 5; // Number of full rotations
+            const totalRotation = (spins * 360) + (360 - targetAngle); // Spin and land on target
+            
+            wheel.style.transform = `rotate(${totalRotation}deg)`;
+            
+            if (navigator.vibrate) {
+                setTimeout(() => navigator.vibrate(200), 3000);
+            }
+            
+            setTimeout(() => {
+                questData.activity = wheelOptions[selectedIndex];
+                document.getElementById('wheelResult').textContent = `✨ ${questData.activity} ✨`;
+                document.getElementById('wheelResult').style.display = 'block';
+                document.getElementById('wheelNext').style.display = 'block';
+                document.querySelector('#quest3 .btn:first-of-type').style.display = 'none';
+                
+                // Track Quest 3 completion
+                sendProgress(3, {
+                    activity_result: questData.activity,
+                    timestamp: new Date().toISOString()
+                });
+            }, 3000);
+        }
+
+        // Quest 4: Heart Catcher Game with Timer (Made faster!)
+        let gameInterval = null;
+        let timerInterval = null;
+        let gameActive = false;
+        let timeRemaining = 20;
+
+        function startHeartGame() {
+            if (gameActive) return;
+            
+            gameActive = true;
+            questData.heartsCaught = 0;
+            questData.heartsMissed = 0;
+            timeRemaining = 20;
+            
+            document.getElementById('heartScore').textContent = '0';
+            document.getElementById('missedScore').textContent = '0';
+            document.getElementById('timeLeft').textContent = '20';
+            document.getElementById('startHeartGame').style.display = 'none';
+            document.getElementById('gameArea').innerHTML = '';
+            
+            // Spawn hearts faster!
+            gameInterval = setInterval(spawnHeart, 500); // Changed from 600 to 500
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            timeRemaining--;
+            document.getElementById('timeLeft').textContent = timeRemaining;
+            
+            if (timeRemaining <= 0) {
+                endGame(false);
+            }
+        }
+
+        function spawnHeart() {
+            if (!gameActive) {
+                clearInterval(gameInterval);
+                return;
+            }
+            
+            if (questData.heartsCaught >= 15) {
+                endGame(true);
+                return;
+            }
+            
+            const gameArea = document.getElementById('gameArea');
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.textContent = ['💖', '💕', '💝', '💗', '💓'][Math.floor(Math.random() * 5)];
+            heart.style.left = Math.random() * (gameArea.offsetWidth - 40) + 'px';
+            heart.style.top = '-50px';
+            
+            // Make hearts fall faster!
+            const fallDuration = 1.5 + Math.random() * 0.5; // Changed from 2 + Math.random() * 1
+            heart.style.animationDuration = fallDuration + 's';
+            
+            heart.addEventListener('click', catchHeart);
+            heart.addEventListener('touchstart', catchHeart);
+            
+            gameArea.appendChild(heart);
+            
+            setTimeout(() => {
+                if (heart.parentNode && gameActive) {
+                    heart.remove();
+                    questData.heartsMissed++;
+                    document.getElementById('missedScore').textContent = questData.heartsMissed;
+                    
+                    if (questData.heartsMissed >= 5) {
+                        endGame(false);
+                    }
+                }
+            }, fallDuration * 1000);
+        }
+
+        function catchHeart(e) {
+            e.preventDefault();
+            if (!gameActive) return;
+            
+            questData.heartsCaught++;
+            document.getElementById('heartScore').textContent = questData.heartsCaught;
+            
+            this.style.animation = 'none';
+            this.style.transform = 'scale(1.5)';
+            this.style.opacity = '0';
+            
+            if (navigator.vibrate) navigator.vibrate(30);
+            
+            setTimeout(() => this.remove(), 200);
+            
+            if (questData.heartsCaught >= 15) {
+                endGame(true);
+            }
+        }
+
+        function endGame(success) {
+            gameActive = false;
+            clearInterval(gameInterval);
+            clearInterval(timerInterval);
+            
+            // Track Quest 4 completion
+            sendProgress(4, {
+                hearts_caught: questData.heartsCaught,
+                hearts_missed: questData.heartsMissed,
+                time_left: timeRemaining,
+                success: success,
+                timestamp: new Date().toISOString()
+            });
+            
+            if (success) {
+                document.getElementById('gameArea').innerHTML = '<p style="text-align: center; padding: 50px; color: #667eea; font-size: 1.5em; font-weight: bold;">Courage Unlocked! 💪</p>';
+                
+                if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 100]);
+                
+                setTimeout(() => startQuest(5), 1500);
+            } else {
+                document.getElementById('gameArea').innerHTML = '<p style="text-align: center; padding: 50px; color: #f5576c; font-size: 1.3em; font-weight: bold;">Oops! Looks like we should connect... 😅</p>';
+                
+                setTimeout(() => {
+                    document.querySelectorAll('.quest').forEach(q => q.classList.remove('active'));
+                    document.getElementById('instagramRequest').classList.add('active');
+                }, 1500);
+            }
+        }
+
+        // Submit Instagram to Google Form
+        function submitInstagram() {
+            const handle = document.getElementById('instagramHandle').value.trim();
+            
+            if (!handle) {
+                alert('Please enter your Instagram handle, Shadia! 😊');
+                return;
+            }
+            
+            questData.instagramHandle = handle;
+            
+            // Track Instagram submission
+            sendProgress('Instagram', {
+                instagram_handle: handle,
+                given_after_game_loss: true,
+                timestamp: new Date().toISOString()
+            });
+            
+            // Google Form submission (for main data collection)
+            const formData = new FormData();
+            formData.append('entry.112536808', handle); // Replace with your actual Google Form entry ID
+            
+            fetch('https://docs.google.com/forms/d/e/1FAIpQLSeLF0qS_emHNEUuF8wfdCjjYgYdZpX-OlaklfxYjAU-cz1_lg/formResponse', {
+                method: 'POST',
+                mode: 'no-cors',
+                body: formData
+            });
+            
+            alert('Got it! See you on Instagram! 😊');
+            startQuest(5);
+        }
+
+        // Quest 5: Special Touch
+        function selectSpecial(btn, special) {
+            document.querySelectorAll('.special-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            questData.special = special;
+            document.getElementById('specialBtn').style.display = 'block';
+            
+            if (navigator.vibrate) navigator.vibrate(50);
+        }
+        
+        function completeQuest5() {
+            // Track Quest 5 completion
+            sendProgress(5, {
+                special_choice: questData.special,
+                timestamp: new Date().toISOString()
+            });
+            startQuest(6);
+        }
+
+        // Quest 6: Rigged Destiny Dice
+        let diceOptions = [];
+        let hasRolled = false;
+
+        function setupDice() {
+            const opt1 = document.getElementById('option1').value.trim();
+            const opt2 = document.getElementById('option2').value.trim();
+            const opt3 = document.getElementById('option3').value.trim();
+            
+            if (!opt1 || !opt2 || !opt3) {
+                alert('Please fill in all 3 options, Shadia! 😊');
+                return;
+            }
+            
+            diceOptions = [
+                opt1,
+                opt2,
+                opt3,
+                'Next Weekend',
+                'Lost your chance, now convince me!!',
+                'Only if you bring Mishti Doi! 🍮'
+            ];
+            
+            // Update list
+            document.getElementById('diceOpt1').textContent = diceOptions[0];
+            document.getElementById('diceOpt2').textContent = diceOptions[1];
+            document.getElementById('diceOpt3').textContent = diceOptions[2];
+            
+            // Update dice faces
+            document.getElementById('face1').textContent = diceOptions[0];
+            document.getElementById('face2').textContent = diceOptions[1];
+            document.getElementById('face3').textContent = diceOptions[2];
+            
+            document.getElementById('setupDiceBtn').style.display = 'none';
+            document.getElementById('diceSection').style.display = 'block';
+            document.querySelectorAll('.input-field').forEach(input => input.disabled = true);
+            
+            if (navigator.vibrate) navigator.vibrate(100);
+        }
+
+        function rollDice() {
+            if (hasRolled) return;
+            hasRolled = true;
+            
+            const dice = document.getElementById('dice');
+            const spins = 5 + Math.floor(Math.random() * 3);
+            const finalRotation = `rotateX(${spins * 360 + 90}deg) rotateY(${spins * 360}deg)`;
+            
+            dice.style.transform = finalRotation;
+            
+            if (navigator.vibrate) {
+                setTimeout(() => navigator.vibrate(200), 2000);
+            }
+            
+            setTimeout(() => {
+                questData.timing = 'Mishti Doi';
+                document.getElementById('diceResult').textContent = '🎲 Result: Only if you bring Mishti Doi! 🍮';
+                document.getElementById('diceResult').style.display = 'block';
+                document.getElementById('rollBtn').style.display = 'none';
+                document.getElementById('rerollBtn').style.display = 'block';
+            }, 2000);
+        }
+
+        function rerollDice() {
+            const dice = document.getElementById('dice');
+            const spins = 4 + Math.floor(Math.random() * 3);
+            const newRotation = `rotateX(${spins * 360 + 90}deg) rotateY(${spins * 360 + 180}deg)`;
+            
+            dice.style.transform = newRotation;
+            document.getElementById('diceResult').style.display = 'none';
+            
+            if (navigator.vibrate) {
+                setTimeout(() => navigator.vibrate(200), 2000);
+            }
+            
+            setTimeout(() => {
+                document.getElementById('diceResult').textContent = '🎲 AGAIN?! Only if you bring Mishti Doi! 🍮';
+                document.getElementById('diceResult').style.display = 'block';
+                document.getElementById('rerollBtn').style.display = 'none';
+                document.getElementById('diceNext').style.display = 'block';
+            }, 2000);
+        }
+
+        function acceptMishtiDoi() {
+            // Track Quest 6 completion
+            sendProgress(6, {
+                dice_result: 'Mishti Doi',
+                user_options: [
+                    document.getElementById('option1').value,
+                    document.getElementById('option2').value,
+                    document.getElementById('option3').value
+                ],
+                timestamp: new Date().toISOString()
+            });
+            
+            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+            startQuest(7);
+        }
+
+        // Quest 7: Puzzle Rearrange Animation
+        const puzzleLetters = ['F', 'R', 'I', 'E', 'N', 'D', 'S', '?', '💕'];
+        let puzzleRevealed = false;
+
+        function startPuzzleReveal() {
+            if (puzzleRevealed) return;
+            puzzleRevealed = true;
+            
+            document.getElementById('revealBtn').style.display = 'none';
+            
+            const container = document.getElementById('puzzleReveal');
+            container.innerHTML = '';
+            
+            puzzleLetters.forEach((letter, index) => {
+                const piece = document.createElement('div');
+                piece.className = 'puzzle-letter';
+                piece.textContent = letter;
+                
+                const randomX = (Math.random() - 0.5) * 400;
+                const randomY = (Math.random() - 0.5) * 400;
+                const randomRot = (Math.random() - 0.5) * 720;
+                
+                piece.style.setProperty('--tx', randomX + 'px');
+                piece.style.setProperty('--ty', randomY + 'px');
+                piece.style.setProperty('--rot', randomRot + 'deg');
+                piece.style.animationDelay = (index * 0.1) + 's';
+                
+                container.appendChild(piece);
+            });
+            
+            if (navigator.vibrate) {
+                setTimeout(() => navigator.vibrate([50, 50, 50, 50, 50]), 500);
+            }
+            
+            setTimeout(() => {
+                document.getElementById('finalNext').style.display = 'block';
+            }, 2000);
+        }
+
+        // Celebration
+        function celebrate() {
+            // Track final YES answer
+            sendProgress(8, {
+                final_answer: 'YES',
+                all_quest_data: questData,
+                timestamp: new Date().toISOString()
+            });
+            
+            document.querySelectorAll('.quest').forEach(q => q.classList.remove('active'));
+            document.getElementById('success').classList.add('active');
+            
+            document.getElementById('cardBricks').textContent = questData.bricks.join(' & ');
+            document.getElementById('cardVibe').textContent = questData.vibe || 'Amazing';
+            document.getElementById('cardActivity').textContent = questData.activity || 'Adventure awaits';
+            document.getElementById('cardSpecial').textContent = questData.special || 'Memorable moments';
+            
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * window.innerWidth + 'px';
+                    confetti.style.top = '-10px';
+                    confetti.style.backgroundColor = ['#ff6b9d', '#c44569', '#f7b731', '#5f27cd', '#00d2d3'][Math.floor(Math.random() * 5)];
+                    confetti.style.transform = 'rotate(' + (Math.random() * 360) + 'deg)';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 30);
+            }
+            
+            if (navigator.vibrate) {
+                navigator.vibrate([200, 100, 200, 100, 200]);
+            }
+        }
+
+        function showThinking() {
+            document.querySelectorAll('.quest').forEach(q => q.classList.remove('active'));
+            document.getElementById('thinking').classList.add('active');
+        }
+
+        function sendThoughts() {
+            let feedback = document.getElementById('feedbackBox').value.trim();
+            
+            // If the input field isn't working, use a prompt as fallback
+            if (!feedback) {
+                feedback = prompt('Share your thoughts... 💭', '');
+                if (!feedback || !feedback.trim()) {
+                    alert('Please share your thoughts first, Shadia! 💭');
+                    return;
+                }
+            }
+            
+            // Track final thoughts
+            sendProgress('Thoughts', {
+                feedback: feedback,
+                final_answer: 'Thinking',
+                all_quest_data: questData,
+                timestamp: new Date().toISOString()
+            });
+            
+            // Send to Google Form
+            const formData = new FormData();
+            formData.append('entry.1483856105', feedback); // Replace with actual entry ID
+            formData.append('entry.1837126776', JSON.stringify(questData)); // Replace with actual entry ID
+            
+            fetch('https://docs.google.com/forms/d/e/YOUR_FORM_ID_HERE/formResponse', {
+                method: 'POST',
+                mode: 'no-cors',
+                body: formData
+            });
+            
+            document.querySelectorAll('.quest').forEach(q => q.classList.remove('active'));
+            document.getElementById('awaiting').classList.add('active');
+            
+            if (navigator.vibrate) navigator.vibrate(100);
+        }
+
+        async function saveQuestCard() {
+            const card = document.getElementById('questCard');
+            
+            try {
+                // Check if html2canvas is loaded
+                if (typeof html2canvas === 'undefined') {
+                    alert('Screenshot feature is loading. Please try again in a moment or take a screenshot manually!');
+                    return;
+                }
+                
+                const canvas = await html2canvas(card, {
+                    backgroundColor: '#1a1a2e',
+                    scale: 2,
+                    logging: false,
+                    useCORS: true,
+                    allowTaint: true
+                });
+                
+                canvas.toBlob(function(blob) {
+                    const link = document.createElement('a');
+                    link.download = 'our-date-quest-shadia-aatmaj.png';
+                    link.href = URL.createObjectURL(blob);
+                    link.click();
+                    URL.revokeObjectURL(link.href);
+                });
+                
+                if (navigator.vibrate) navigator.vibrate(100);
+                
+            } catch (error) {
+                console.error('Error saving card:', error);
+                alert('Screenshot failed - Please take a screenshot manually using your device:\n\n' +
+                    'Phone: Press Power + Volume Down\n' +
+                    'iPhone: Press Power + Volume Up\n' + 
+                    'Computer: Use Print Screen or screenshot tool');
+            }
+        }
+
+        function copyLink() {
+            const url = window.location.href;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('Link copied! Share it with friends! 🔗');
+                    if (navigator.vibrate) navigator.vibrate(50);
+                });
+            } else {
+                const textarea = document.createElement('textarea');
+                textarea.value = url;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('Link copied! Share it with friends! 🔗');
+            }
+        }
+    </script>
+</body>
+</html>
